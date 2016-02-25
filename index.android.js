@@ -12,13 +12,56 @@ import React, {
     Image
 } from 'react-native';
 
-var MOCKED_MOVIES_DATA = [
-    {title: '标题', year: '2015', posters: {thumbnail: 'http://i.imgur.com/UePbdph.jpg'}},
-];
+/**
+ * 为了避免骚扰，我们用了一个样例数据来替代Rotten Tomatoes的API
+ * 请求，这个样例数据放在React Native的Github库中。
+ */
+var REQUEST_URL = 'https://raw.githubusercontent.com/facebook/react-native/master/docs/MoviesExample.json';
+
 
 class read extends Component {
+    constructor(props) {
+        super(props); //这一句不能省略，照抄即可
+        this.state = {
+            movies: null,//这里放你自己定义的state变量及初始值
+        }
+    }
+
+    componentDidMount() {
+        this.fetchData();
+    }
+
+    fetchData() {
+        fetch(REQUEST_URL)
+            .then((response) => response.json())
+            .then((responseData) => {
+                this.setState({
+                    movies: responseData.movies,
+                });
+            })
+            .done();
+    }
+
     render() {
-        var movie = MOCKED_MOVIES_DATA[0];
+        if (!this.state.movies) {
+            return this.renderLoadingView();
+        }
+        var movie = this.state.movies[0];
+        return this.renderMovie(movie);
+    }
+
+    renderLoadingView() {
+        return (
+            <View style={styles.container}>
+                <Text>
+                    正在加载电影数据……
+                </Text>
+            </View>
+        );
+    }
+
+    renderMovie(movie) {
+
         return (
             <View style={styles.container}>
                 <Image
@@ -32,12 +75,13 @@ class read extends Component {
             </View>
         );
     }
+
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        flexDirection:'row',
+        flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#F5FCFF',
@@ -46,16 +90,16 @@ const styles = StyleSheet.create({
         width: 53,
         height: 81,
     },
-    rightContainer:{
-        flex:1,
+    rightContainer: {
+        flex: 1,
     },
-    title:{
-        fontSize:20,
-        marginBottom:8,
-        textAlign:'center'
+    title: {
+        fontSize: 20,
+        marginBottom: 8,
+        textAlign: 'center'
     },
-    year:{
-        textAlign:'center'
+    year: {
+        textAlign: 'center'
     }
 });
 
