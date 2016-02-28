@@ -11,7 +11,10 @@ import React, {
     View,
     Image,
     ListView,
-    Animated
+    Animated,
+    TouchableOpacity,
+    LayoutAnimation,
+    TouchableWithoutFeedback,
 } from 'react-native';
 
 /**
@@ -21,6 +24,8 @@ import React, {
 var REQUEST_URL = 'https://raw.githubusercontent.com/facebook/react-native/master/docs/MoviesExample.json';
 
 
+
+//列表
 class read extends Component {
     constructor(props) {
         super(props); //这一句不能省略，照抄即可
@@ -89,35 +94,10 @@ class read extends Component {
 
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#F5FCFF',
-    },
-    thumbnail: {
-        width: 53,
-        height: 81,
-    },
-    rightContainer: {
-        flex: 1,
-    },
-    title: {
-        fontSize: 10,
-        marginBottom: 8,
-        textAlign: 'center'
-    },
-    year: {
-        textAlign: 'center'
-    },
-    listView: {
-        paddingTop: 20,
-        backgroundColor: '#F5FCFF',
-    },
-});
 
+
+
+//开机动画
 class Playground extends React.Component {
   constructor(props: any) {
     super(props);
@@ -149,4 +129,68 @@ class Playground extends React.Component {
     ).start();                                // 开始执行动画
   }
 }
-AppRegistry.registerComponent('read', () => Playground);
+
+
+//红色方块 点击会在变色
+var tweenState = require('react-tween-state');
+
+var App = React.createClass({
+  mixins: [tweenState.Mixin],
+
+  getInitialState() {
+    return { opacity: 1 }
+  },
+
+  _animateOpacity() {
+    this.tweenState('opacity', {
+      easing: tweenState.easingTypes.easeOutQuint,
+      duration: 1000,
+      endValue: this.state.opacity === 0.2 ? 1 : 0.2,
+    });
+  },
+
+  render() {
+    return (
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <TouchableWithoutFeedback onPress={this._animateOpacity}>
+          <View ref={component => this._box = component}
+                style={{width: 200, height: 200, backgroundColor: 'red',
+                        opacity: this.getTweeningValue('opacity')}} />
+        </TouchableWithoutFeedback>
+      </View>
+    )
+  },
+});
+
+
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#F5FCFF',
+    },
+    thumbnail: {
+        width: 53,
+        height: 81,
+    },
+    rightContainer: {
+        flex: 1,
+    },
+    title: {
+        fontSize: 10,
+        marginBottom: 8,
+        textAlign: 'center'
+    },
+    year: {
+        textAlign: 'center'
+    },
+    listView: {
+        paddingTop: 20,
+        backgroundColor: '#F5FCFF',
+    }
+});
+
+AppRegistry.registerComponent('read', () => App);
