@@ -164,6 +164,60 @@ var App = React.createClass({
 
 
 
+//补间动画
+
+var rebound = require('rebound');
+
+var App2 = React.createClass({
+  // 首先我们初始化一个spring动画，并添加监听函数，
+  // 这个函数会在spring更新时调用setState
+  componentWillMount() {
+    // 初始化spring
+    this.springSystem = new rebound.SpringSystem();
+    this._scrollSpring = this.springSystem.createSpring();
+    var springConfig = this._scrollSpring.getSpringConfig();
+    springConfig.tension = 230;
+    springConfig.friction = 10;
+
+    this._scrollSpring.addListener({
+      onSpringUpdate: () => {
+        this.setState({scale: this._scrollSpring.getCurrentValue()});
+      },
+    });
+
+    // 将spring的初始值设为1
+    this._scrollSpring.setCurrentValue(1);
+  },
+
+  _onPressIn() {
+    this._scrollSpring.setEndValue(0.5);
+  },
+
+  _onPressOut() {
+    this._scrollSpring.setEndValue(1);
+  },
+
+  render: function() {
+    var imageStyle = {
+      width: 350,
+      height: 400,
+      transform: [{scaleX: this.state.scale}, {scaleY: this.state.scale}],
+    };
+
+    var imageUri = "https://facebook.github.io/react-native/img/ReboundExample.png";
+
+    return (
+      <View style={styles.container}>
+        <TouchableWithoutFeedback onPressIn={this._onPressIn}
+                                  onPressOut={this._onPressOut}>
+          <Image source={{uri: imageUri}} style={imageStyle} />
+        </TouchableWithoutFeedback>
+      </View>
+    );
+  }
+});
+
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -193,4 +247,4 @@ const styles = StyleSheet.create({
     }
 });
 
-AppRegistry.registerComponent('read', () => App);
+AppRegistry.registerComponent('read', () => App2);
